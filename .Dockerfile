@@ -1,7 +1,7 @@
-FROM centos:7.2.1511
+FROM centos:centos7.9.2009
 
 # author label
-LABEL maintainer="jclian"
+LABEL maintainer="yali"
 
 # install related packages
 ENV ENVIRONMENT DOCKER_PROD
@@ -10,22 +10,21 @@ RUN cd / && ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && yum install -y wget aclocal automake autoconf make gcc gcc-c++ python-devel mysql-devel bzip2 libffi-devel epel-release \
     && yum clean all
 
-# install python 3.7.0
-RUN wget https://npm.taobao.org/mirrors/python/3.7.0/Python-3.7.0.tar.xz \
-    && tar -xvf Python-3.7.0.tar.xz -C /usr/local/ \
-    && rm -rf Python-3.7.0.tar.xz \
-    && cd /usr/local/Python-3.7.0 \
-    && ./configure && make && make install
+RUN mkdir -p ~/miniconda3 \
+    && wget --no-check-certificate https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh \
+    && bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3 \
+    && rm -rf ~/miniconda3/miniconda.sh
+ENV PATH=/opt/miniconda/bin:${PATH}
 
 # 创建src目录
 COPY src /root/src
 WORKDIR /root/src
 
 # install related packages
-RUN pip3 install -i https://pypi.doubanio.com/simple/ -r requirements.txt
+# RUN pip3 install -i https://pypi.doubanio.com/simple/ -r requirements.txt
 
 # expose port
-EXPOSE 15731
+EXPOSE 23455
 
 # install ssh
 RUN yum -y update; yum clean all
